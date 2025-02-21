@@ -2,15 +2,18 @@ import 'package:eman_zainaldeen_final/route/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/cart_controller.dart';
+import '../widgets/cart_card.dart';
 
 class CartScreen extends GetView<CartController> {
   final TextEditingController couponController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Cart".tr),
+        title: Obx(() => Text("Cart (${controller.cartList.length})".tr)),
         actions: [
           IconButton(
             icon: Icon(Icons.delete),
@@ -31,7 +34,10 @@ class CartScreen extends GetView<CartController> {
         child: Obx(() {
           if (controller.cartList.isEmpty) {
             return Center(
-              child: Text("The List is Empty".tr, style: TextStyle(fontSize: 18)),
+              child: Text(
+                "The List is Empty".tr,
+                style: TextStyle(fontSize: 18, color: isDarkMode ? Colors.white : Colors.black),
+              ),
             );
           }
           return Column(
@@ -42,52 +48,18 @@ class CartScreen extends GetView<CartController> {
                   separatorBuilder: (context, index) => SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final item = controller.cartList[index];
-                    return Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(
-                                item.imageUrl,
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons.image_not_supported, size: 80, color: Colors.grey);
-                                },
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                  SizedBox(height: 4),
-                                  Text("${item.address} - ${item.price} SR",
-                                      style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-                                ],
-                              ),
-                            ),
-
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => controller.removeBooking(index),
-                            ),
-                          ],
-                        ),
-                      ),
+                    return CartCard(
+                      imageUrl: item.imageUrl,
+                      name: item.name,
+                      address: item.address,
+                      price: item.price,
+                      onRemove: () => controller.removeBooking(index),
                     );
                   },
                 ),
               ),
-
               Card(
+                color: isDarkMode ? Colors.grey[900] : Colors.white,
                 elevation: 4,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
@@ -96,10 +68,18 @@ class CartScreen extends GetView<CartController> {
                     children: [
                       TextField(
                         controller: couponController,
+                        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                         decoration: InputDecoration(
                           labelText: "Have Coupon?".tr,
+                          labelStyle: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                           border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.discount),
+                          prefixIcon: Icon(Icons.discount, color: isDarkMode ? Colors.white70 : Colors.black54),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: isDarkMode ? Colors.white30 : Colors.black26),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
+                          ),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -108,15 +88,22 @@ class CartScreen extends GetView<CartController> {
                           controller.applyDiscount(couponController.text);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: isDarkMode ? Colors.grey[800] : Colors.blue,
                           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         ),
-                        child: Text("CHECK".tr, style: TextStyle(fontSize: 16, color: Colors.white)),
+                        child: Text(
+                          "CHECK".tr,
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                       ),
                       SizedBox(height: 20),
                       Obx(() => Text(
                         "Total Order Value: ${controller.totalPrice.value} SR",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
                       )),
                     ],
                   ),

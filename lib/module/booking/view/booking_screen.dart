@@ -14,7 +14,7 @@ class BookingScreen extends GetView<BookingController> {
         title: Text("Events".tr),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
             onPressed: () {
               Get.toNamed(Routes.SETTINGS);
             },
@@ -22,17 +22,20 @@ class BookingScreen extends GetView<BookingController> {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Obx(() {
-          if (controller.bookingList.isEmpty) {
+          final availableEvents = controller.bookingList.where((event) => event.isAvailable).toList();
+
+          if (availableEvents.isEmpty) {
             return Center(
-              child: Text("No events available".tr, style: TextStyle(fontSize: 18)),
+              child: Text("No available events".tr, style: const TextStyle(fontSize: 18)),
             );
           }
+
           return ListView.builder(
-            itemCount: controller.bookingList.length,
+            itemCount: availableEvents.length,
             itemBuilder: (context, index) {
-              final booking = controller.bookingList[index];
+              final booking = availableEvents[index];
               return EventCard(
                 imageUrl: booking.imageUrl,
                 name: booking.name,
@@ -49,7 +52,7 @@ class BookingScreen extends GetView<BookingController> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
-        child: Icon(Icons.shopping_cart, color: Colors.white),
+        child: const Icon(Icons.shopping_cart, color: Colors.white),
         onPressed: () {
           Get.toNamed(Routes.CART);
         },

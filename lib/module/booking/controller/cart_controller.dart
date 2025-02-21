@@ -1,3 +1,4 @@
+import 'package:eman_zainaldeen_final/module/booking/controller/booking_controller.dart';
 import 'package:get/get.dart';
 import '../model/booking_model.dart';
 
@@ -11,13 +12,22 @@ class CartController extends GetxController {
   }
 
   void removeBooking(int index) {
+    final removedEvent = cartList[index];
     cartList.removeAt(index);
+    Get.find<BookingController>().restoreEvent(removedEvent);
     calculateTotalPrice();
+    update();
   }
 
   void clearCart() {
-    cartList.clear();
-    totalPrice.value = 0.0;
+    final removedEvents = List<BookingModel>.from(cartList);
+   cartList.clear();
+   final bookingController = Get.find<BookingController>();
+   for (var event in removedEvents) {
+      bookingController.restoreEvent(event);
+    }
+   totalPrice.value = 0.0;
+   update();
   }
 
   void calculateTotalPrice() {
